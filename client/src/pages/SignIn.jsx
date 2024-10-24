@@ -1,14 +1,18 @@
-import { Button, Label, TextInput } from "flowbite-react"
+import {Alert, Spinner, Button, Label, TextInput } from "flowbite-react"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import createToast from "../utilis/toastify";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux"
 
 
 const SignIn = () => {
   const [formData, setFormData ] = useState({});
-  const [loading, setLoading ] = useState(false); 
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { loading, error: errorMessage } = useSelector((state) => state.user)
  
   // handle input change 
   const handleChange = (e) => {
@@ -18,30 +22,41 @@ const SignIn = () => {
   // handle form submit 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+   
 
     // validation 
     if ( !formData.email || !formData.password ) {
-      setLoading(false); 
-      return createToast("All fields are Required", );
+      dispatch(signInFailure("Please Fill All The Fields")); 
+      return createToast("All fields are Required" );
     }
 
 
     try {
+      dispatch(signInStart());
+
       const res = await fetch('/api/auth/signin', {
         method : "POST",
         headers : { "Content-Type" : "application/json"},
         body : JSON.stringify(formData)
       })
       const data = await res.json();
-      setLoading(false); 
-      createToast("User Login SuccessFull", "success");
-      navigate("/");
+
+      // if data is not okay 
+      if (data.success === false ) {
+         dispatch(signInFailure(data.message))
+      }
+
+      // if response is ok 
+      if (res.ok) {
+          dispatch(signInSuccess(data));
+          createToast("User Login SuccessFull", "success");
+          navigate("/");
+      }
+      
 
     } catch (error) {
-       setLoading(true); 
-       console.log(error.message);
-       createToast("SomeThing Went Wrong");
+        dispatch(signInFailure(error.message))
+        createToast("SomeThing Went Wrong");
     }
   }
   
@@ -81,10 +96,15 @@ const SignIn = () => {
                   />
                 </div>
                 <Button gradientDuoTone="purpleToPink" type="submit"> 
-                  {
-                    loading ? <p className="text-sm font-medium"> Login...</p> : "Sign In"
+                { loading ? (
+                    <>
+                      <Spinner size='sm' />
+                      <span className='pl-3'>Loading...</span>
+                    </>
+                    ) : (
+                      'Sign In'
+                    )
                   }
-                    
                 </Button>
              </form>
              <div className="flex gap-2 mt-5 text-md ">
@@ -93,6 +113,13 @@ const SignIn = () => {
                   Sign Up
                </Link>
              </div>
+             { 
+              errorMessage && (
+               <Alert className='mt-5' color='failure'>
+                   {errorMessage}
+                </Alert>
+               )
+              }
            </div>
         </div>
 
