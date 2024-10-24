@@ -9,14 +9,7 @@ export default {
   ],
   theme: {
     extend: {
-      container : {
-        center : true,
-        padding : {
-          DEFAULT : "1rem",
-          sm: "3rem",
-          xl: "5rem",
-        }
-      },
+      
     },
   },
   plugins: [
