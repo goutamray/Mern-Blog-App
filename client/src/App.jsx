@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard'
 // components
 import Header from './components/Header';
 import FooterPart from './components/FooterPart';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -41,7 +42,9 @@ function App() {
               <Route path='/' element={<Home />}/>
               <Route path='/about' element={<About />}/>
               <Route path='/projects' element={<Projects />}/>
-              <Route path='/dashboard' element={<Dashboard />}/>
+              <Route element={<PrivateRoute />}>
+                  <Route path='/dashboard' element={<Dashboard />}/>
+              </Route>
               <Route path='/sign-up' element={<SignUp />}/>
               <Route path='/sign-in' element={<SignIn />}/>
           </Routes>
