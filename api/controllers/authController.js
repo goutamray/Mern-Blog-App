@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken"
 /**
  * @DESC CREATE USER 
  * @METHOD POST
- * @ROUTE /api/user/signup
+ * @ROUTE /api/auth/signup
  * @ACCESS PUBLIC 
  * 
  */
@@ -33,7 +33,7 @@ return res.json({ newUser, message : "Signup SuccessFull"})
 /**
  * @DESC LOGIN USER 
  * @METHOD POST
- * @ROUTE /api/user/signin
+ * @ROUTE /api/auth/signin
  * @ACCESS PUBLIC 
  * 
  */
@@ -63,9 +63,9 @@ try {
   // create token 
   const accessToken = jwt.sign({ id : validUser._id }, process.env.JWT_SECRET);
 
+  const {password : pass, ...rest } = validUser._doc;
 
- const {password : pass, ...rest } = validUser._doc;
-
+  // response 
   return res.status(200).cookie("access_token", accessToken, { httpOnly : true, }).json(rest); 
   
 } catch (error) {
@@ -75,4 +75,58 @@ try {
 });  
 
 
+/**
+ * @DESC GOOGLE LOGIN USER 
+ * @METHOD POST
+ * @ROUTE /api/auth/google
+ * @ACCESS PUBLIC 
+ * 
+ */
+export const google = asyncHandler( async (req, res) => {
+  const { email, name, googlePhotoUrl } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET
+      );
+      const { password, ...rest } = user._doc;
+      res
+        .status(200)
+        .cookie('access_token', token, {
+          httpOnly: true,
+        })
+        .json(rest);
+
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        name:
+          name.toLowerCase().split(' ').join('') +
+          Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        photo : googlePhotoUrl,
+      });
+      await newUser.save();
+      const token = jwt.sign(
+        { id: newUser._id },
+        process.env.JWT_SECRET
+      );
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie('access_token', token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
+}) ;
 

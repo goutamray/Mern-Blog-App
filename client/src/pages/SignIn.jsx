@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import createToast from "../utilis/toastify";
 import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux"
+import OAuth from "../components/OAuth";
 
 
 const SignIn = () => {
@@ -107,6 +108,7 @@ const SignIn = () => {
                   }
                 </Button>
              </form>
+             <OAuth />
              <div className="flex gap-2 mt-5 text-md ">
                <span>Dont Have an Account </span>
                <Link to="/sign-up" className="text-blue-500">

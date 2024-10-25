@@ -2,6 +2,7 @@ import { Button, Label, TextInput } from "flowbite-react"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import createToast from "../utilis/toastify";
+import OAuth from "../components/OAuth";
 
 
 const SignUp = () => {
@@ -96,6 +97,7 @@ const SignUp = () => {
                     
                 </Button>
              </form>
+             <OAuth />
              <div className="flex gap-2 mt-5 text-md ">
                <span> Have an Account </span>
                <Link to="/sign-in" className="text-blue-500">
