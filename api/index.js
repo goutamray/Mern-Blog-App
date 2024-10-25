@@ -4,6 +4,7 @@ import colors from "colors"
 import cors from "cors" ;
 import mongoDbConnect from "./config/mongoDb.js";
 import { errorHandler } from "./utilis/errorHandler.js";
+import cookieParser from "cookie-parser";
 
 import userRouter from "./routes/user.js"
 import authRouter from "./routes/auth.js"
@@ -20,6 +21,7 @@ app.use(express.static("public"));
 // set middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended : false}));
+app.use(cookieParser()); 
 app.use(cors({
   origin : "http://localhost:5173",
   credentials : true,
