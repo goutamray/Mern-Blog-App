@@ -109,3 +109,20 @@ export const updateUser = asyncHandler(async (req, res) => {
 
 
 
+ 
+/**
+ * @DESC SIGNOUT USER 
+ * @METHOD POST
+ * @ROUTE /api/user/signout
+ * @ACCESS PUBLIC 
+ * 
+ */
+export const signOutUser = asyncHandler(async(req, res) => {
+   try {
+     res.clearCookie("access_token");
+     return res.status(200).json({ message : "User sign out Successfull"})
+   } catch (error) {
+     console.log(error.message);
+   }
+}); 
+

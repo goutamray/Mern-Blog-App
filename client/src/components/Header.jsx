@@ -7,6 +7,8 @@ import { toggleTheme } from "../redux/theme/themeSlice";
 import { AiOutlineSearch  } from "react-icons/ai"
 import { FaMoon } from "react-icons/fa6";
 import { FaSun } from 'react-icons/fa';
+import createToast from "../utilis/toastify";
+import { signOutSuccess } from "../redux/user/userSlice";
 
 
 const Header = () => {
@@ -15,6 +17,27 @@ const Header = () => {
 
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
+
+
+    // user sign out 
+    const handleUserSignout = async() => {
+      try {
+        const res = await fetch("/api/user/signout", {
+          method : "POST"
+        });
+        const data = await res.json();
+  
+        if (!res.ok) {
+          console.log(data.message);
+        }else{
+           dispatch(signOutSuccess());
+           createToast("Sign Out SuccessFull", "success"); 
+        }
+      } catch (error) {
+        console.log(error.message);
+        
+      }
+    }
 
   return (
     <>
@@ -70,7 +93,7 @@ const Header = () => {
                <Dropdown.Item> Profile </Dropdown.Item>
             </Link>
             <DropdownDivider/>
-            <Dropdown.Item> Sign Out </Dropdown.Item>
+            <Dropdown.Item onClick={handleUserSignout}> Sign Out </Dropdown.Item>
 
             </Dropdown> :
              ( <Link to="sign-in">

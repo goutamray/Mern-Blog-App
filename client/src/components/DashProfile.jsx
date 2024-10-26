@@ -10,9 +10,10 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess } from "../redux/user/userSlice";
+import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserFailure, deleteUserSuccess, signOutSuccess } from "../redux/user/userSlice";
 
 import createToast from "../utilis/toastify";
+import { Link } from "react-router-dom"
 
 const DashProfile = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -120,11 +121,9 @@ const DashProfile = () => {
 
     try {
       dispatch(deleteUserStart());
-
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
         method : "DELETE"
       });
-
       const data = await res.json();
 
       if (!res.ok) {
@@ -137,6 +136,28 @@ const DashProfile = () => {
        dispatch(deleteUserFailure(error.message))
     }
   }
+
+
+  // user sign out 
+  const handleUserSignout = async() => {
+    try {
+      const res = await fetch("/api/user/signout", {
+        method : "POST"
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data.message);
+      }else{
+         dispatch(signOutSuccess());
+         createToast("Sign Out SuccessFull", "success"); 
+      }
+    } catch (error) {
+      console.log(error.message);
+      
+    }
+  }
+
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
@@ -196,11 +217,35 @@ const DashProfile = () => {
         <Button gradientDuoTone="purpleToBlue" type="submit" outline>
           Update
         </Button>
+        {
+          currentUser.isAdmin && (
+            <Link to="/create-post"> 
+              <Button 
+                type="button"
+                gradientDuoTone="purpleToPink"
+                className="capitalize w-full"
+              >
+               Create a post 
+              </Button>
+            </Link>
+          )
+        }
       </form>
       <div className="text-red-500 flex justify-between mt-5">
-        <span onClick={() => setShowModal(true)} className="cursor-pointer text-md font-semibold">Delete Account</span>
-        <span className="cursor-pointer text-md font-semibold">Sign Out</span>
+        <span 
+           onClick={() => setShowModal(true)} 
+           className="cursor-pointer text-md font-semibold"
+           >
+            Delete Account
+        </span>
+        <span 
+          className="cursor-pointer text-md font-semibold"
+          onClick={handleUserSignout}
+          >
+            Sign Out
+        </span>
       </div>
+
       <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md">
           <Modal.Header />
           <Modal.Body>
@@ -220,6 +265,7 @@ const DashProfile = () => {
           </div>
         </Modal.Body>
       </Modal> 
+
     </div>
   );
 };

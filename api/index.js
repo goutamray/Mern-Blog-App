@@ -6,8 +6,9 @@ import mongoDbConnect from "./config/mongoDb.js";
 import { errorHandler } from "./utilis/errorHandler.js";
 import cookieParser from "cookie-parser";
 
-import userRouter from "./routes/user.js"
-import authRouter from "./routes/auth.js"
+import userRouter from "./routes/user.js";
+import authRouter from "./routes/auth.js";
+import postRouter from "./routes/post.js";
 
 // env config
 dotenv.config();
@@ -31,6 +32,7 @@ app.use(cors({
 // routes 
 app.use("/api/user", userRouter); 
 app.use("/api/auth", authRouter); 
+app.use("/api/post", postRouter); 
 
 
 // error handler 
