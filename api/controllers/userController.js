@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler"; 
 import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken"
+import { fileUploadToCloud } from "../utilis/cloudinary.js";
 
 
 /**
@@ -30,56 +32,80 @@ export const getAllUsers = asyncHandler(async(req, res) => {
  * 
  */
 export const updateUser = asyncHandler(async (req, res) => {
-   // Check for valid user ID
-   if (req.user.id !== req.params.userId) {
-     return res.status(400).json({ message: "User ID not found" });
-   }
- 
-   // Password validation and hashing
-   if (req.body.password) {
-     if (req.body.password.length < 6) {
-       return res.status(400).json({ message: "Password must be at least 6 characters" });
-     }
-     req.body.password = bcryptjs.hashSync(req.body.password, 10);
-   }
- 
-   // Name validation
-   if (req.body.name) {
-     if (req.body.name.length < 5 || req.body.name.length > 30) {
-       return res.status(400).json({ message: "User name must be between 5 and 30 characters" });
-     }
-   }
- 
-   try {
-     // Attempt to find and update the user
-     const updatedUser = await User.findByIdAndUpdate(
-       req.params.userId,
-       {
-         $set: {
-           name: req.body.name,
-           email: req.body.email,
-           photo: req.body.photo,
-           ...(req.body.password && { password: req.body.password }),
-         },
-       },
-       { new: true }
-     );
- 
-     // If user not found, return 404
-     if (!updatedUser) {
-       console.error("User not found with ID:", req.params.userId);
-       return res.status(404).json({ message: "User not found" });
-     }
- 
-     // Omit the password from the response
-     const { password, ...rest } = updatedUser._doc;
- 
-     return res.status(200).json(rest);
- 
-   } catch (error) {
-     console.error("Error updating user:", error.message);
-     return res.status(500).json({ message: "An error occurred while updating the user." });
-   }
- });
+  const { id } = req.params;
+  const { name, email } = req.body;
 
+  try {
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Handle photo upload if a new file is provided
+    let filedata = existingUser.photo;
+    if (req.file) {
+      console.log("File received for upload:", req.file); // Debug log
+      const data = await fileUploadToCloud(req.file.path);
+      filedata = data.secure_url;
+      console.log("Uploaded photo URL:", filedata); // Debug log
+    }
+
+    // Update user data
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        name: name || existingUser.name,
+        email: email || existingUser.email,
+        photo: filedata,
+      },
+      { new: true }
+    );
+
+    // Generate a new JWT with updated user info
+    const newToken = jwt.sign(
+      {
+        id: updatedUser._id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        photo: updatedUser.photo,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    // Send updated user and new token as a response
+    res
+      .cookie("access_token", newToken, { httpOnly: false, secure: false })
+      .status(200)
+      .json({ updatedUser, token: newToken, message: "User data updated successfully" });
+  } catch (error) {
+    console.error("Error updating user:", error); // Debug log
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+
+/**
+ * @DESC DELETE USER 
+ * @METHOD PATCH
+ * @ROUTE /api/user/delete/:id
+ * @ACCESS PUBLIC 
+ * 
+ */
+  export const deleteUser = asyncHandler(async(req, res) => {
+    // get params 
+    const { id } = req.params;
  
+    // delete user data 
+    const user = await User.findByIdAndDelete(id);
+ 
+    // delete cloud file
+     await fileDeleteFromCloud(findPublicId(user.photo));  
+ 
+    // response  
+    res.status(200).json({ user, message : "User deleted successfull"});
+ });  
+
+
+
