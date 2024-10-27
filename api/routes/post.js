@@ -12,7 +12,6 @@ router.post("/create", verifyToken, createPost);
 router.get("/getposts", getAllPosts); 
 
 
-
 // export default router 
 export default router;
 
