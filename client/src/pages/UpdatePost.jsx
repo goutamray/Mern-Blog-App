@@ -90,14 +90,8 @@ const UpdatePost = ()=> {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Ensure formData._id is defined
-    if (!formData._id) {
-      setPublishError('Post ID is missing');
-      return;
-    }
-  
     try {
-      const res = await fetch(`/api/post/updatepost/${formData._id}/${currentUser._id}`, {
+      const res = await fetch(`/api/post/updatepost/${postId}/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +106,7 @@ const UpdatePost = ()=> {
       }
   
       setPublishError(null);
-      navigate(`/post/${data.slug}`);
+      navigate("/dashboard?tab=posts");
     } catch (error) {
       setPublishError('Something went wrong');
     }
@@ -133,13 +127,13 @@ const UpdatePost = ()=> {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            value={formData.title}
+            value={formData?.title}
           />
           <Select
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
-            value={formData.category}
+            value={formData?.category}
           >
             <option value='uncategorized'>Select a category</option>
             <option value='javascript'>JavaScript</option>
@@ -174,16 +168,16 @@ const UpdatePost = ()=> {
           </Button>
         </div>
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
-        {formData.image && (
+        {formData?.image && (
           <img
-            src={formData.image}
+            src={formData?.image}
             alt='upload'
             className='w-full h-72 object-cover'
           />
         )}
         <ReactQuill
           theme='snow'
-          value={formData.content}
+          value={formData?.content}
           placeholder='Write something...'
           className='h-72 mb-12'
           required

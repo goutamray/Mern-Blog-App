@@ -82,7 +82,7 @@ const CreatePost = () => {
           setPublishError(data.message);
          }else{
           setPublishError(null);
-          navigate(`/post/${data.slug}`);
+          navigate(`/dashboard?tab=posts`);
          }
 
    } catch (error) {
