@@ -9,7 +9,7 @@ import { userPhotoMulter } from "../utilis/multer.js";
 const router = express.Router();
 
 // routing
-router.get("/", getAllUsers); 
+router.get("/getUsers", verifyToken, getAllUsers); 
 router.patch("/update/:id", verifyToken, userPhotoMulter, updateUser); 
 router.delete("/delete/:id", verifyToken, deleteUser);
 router.post("/signout", signOutUser)

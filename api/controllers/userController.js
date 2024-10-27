@@ -12,16 +12,53 @@ import { fileUploadToCloud } from "../utilis/cloudinary.js";
  * 
  */
 export const getAllUsers = asyncHandler(async(req, res) => {
-  // get all users 
-   const users = await User.find(); 
-     
-  // check users data 
-  if ( !users) {
-     return res.status(404).json({ users : "", message : "Users Not Found"});
-  }; 
+  if (!req.user.isAdmin) {
+    res.status(400).json({ message : "You are not allow to see all users"});
+  }
 
- res.status(200).json({ users, message : "All users data"});
+ try {
+   const startIndex = parseInt(req.query.startIndex) || 0 ;
+   const limit = parseInt(req.query.limit) || 9 ;
+   const sortDirection = req.query.sort === "asc" ? 1 : -1 ;
+
+  // get all users 
+  const users = await User.find()
+        .sort({ createdAt : sortDirection})
+        .skip(startIndex)
+        .limit(limit);
+
+
+  const usersWithoutPassword = users.map((user) => {
+    const { password, ...rest} = user._doc; 
+    return rest;
+  });
+
+  const totalUsers = await User.countDocuments();
+
+  const now = new Date();
+ 
+  const oneMonthAgo = new Date(
+    now.getFullYear(),
+    now.getMonth() - 1,
+    now.getDate(),
+  );
+
+  const lastMonthUsers = await User.countDocuments({ createdAt : {$gte : oneMonthAgo }});
+
+  // response 
+  res.status(200).json({ 
+    users : usersWithoutPassword, 
+    totalUsers,
+    lastMonthUsers , 
+    message : "All users data"
+  });
+
+ } catch (error) {
+   console.log(error.message);
+ }
+
 });  
+
 
 /**
  * @DESC UPDATE USER 
@@ -95,6 +132,10 @@ export const updateUser = asyncHandler(async (req, res) => {
   export const deleteUser = asyncHandler(async(req, res) => {
     // get params 
     const { id } = req.params;
+  
+    if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+       return res.status(400).json({message : "You are not allow to delete user"})
+    }
  
     // delete user data 
     const user = await User.findByIdAndDelete(id);

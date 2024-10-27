@@ -15,6 +15,8 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { fireBaseApp } from '../firebase';
+import createToast from '../utilis/toastify';
 
 const UpdatePost = ()=> {
   const [file, setFile] = useState(null);
@@ -56,7 +58,7 @@ const UpdatePost = ()=> {
         return;
       }
       setImageUploadError(null);
-      const storage = getStorage(app);
+      const storage = getStorage(fireBaseApp);
       const fileName = new Date().getTime() + '-' + file.name;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -70,6 +72,8 @@ const UpdatePost = ()=> {
         (error) => {
           setImageUploadError('Image upload failed');
           setImageUploadProgress(null);
+          console.log(error.message);
+          
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
@@ -107,7 +111,9 @@ const UpdatePost = ()=> {
   
       setPublishError(null);
       navigate("/dashboard?tab=posts");
+      createToast("Post Updated Successfull", "success")
     } catch (error) {
+      console.log(error.message);
       setPublishError('Something went wrong');
     }
   };
@@ -168,9 +174,9 @@ const UpdatePost = ()=> {
           </Button>
         </div>
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
-        {formData?.image && (
+        {formData.image && (
           <img
-            src={formData?.image}
+            src={formData.image}
             alt='upload'
             className='w-full h-72 object-cover'
           />
