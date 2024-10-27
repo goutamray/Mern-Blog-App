@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler"; 
-import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken"
 import { fileUploadToCloud } from "../utilis/cloudinary.js";
 

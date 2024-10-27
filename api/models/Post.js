@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 
+
 // create user schema
 const postSchema = mongoose.Schema({
-  userId : {
+  userId: {
     type: String,
-    trim : true,
-  }, 
+    required: true,
+  },
   content : {
     type : String,
     trim : true, 

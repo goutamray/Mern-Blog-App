@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler"; 
 import Post from "../models/Post.js";
+import mongoose from "mongoose";
 
 
 /**
@@ -94,7 +95,133 @@ export const getAllPosts = asyncHandler(async(req, res) => {
     console.log(error.message);
     
   }
-})
+});
 
+
+/**
+ * @DESC DELETE POSTS 
+ * @METHOD DELETE
+ * @ROUTE /api/post/deletepost/:postId/:userId
+ * @ACCESS PRIVATE  
+ * 
+ */
+export const deletePost = asyncHandler(async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'You are not allowed to delete this post'));
+  }
+
+  try {
+    const postId = req.params.postId;
+    
+    // Check if postId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return next(errorHandler(400, 'Invalid post ID'));
+    }
+
+    await Post.findByIdAndDelete(postId);
+    res.status(200).json('The post has been deleted');
+  } catch (error) {
+    console.log(error.message);
+    return next(error);
+  }
+});
+
+
+/**
+ * @DESC UPDATE POSTS 
+ * @METHOD UPDATE
+ * @ROUTE /api/post/updatepost/:postId/:userId
+ * @ACCESS PRIVATE  
+ * 
+ */
+export const updatePost = asyncHandler(async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return res.status(400).json({ message : "You are not allowed to update this post"})
+  }
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          category: req.body.category,
+          image: req.body.image,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(updatedPost);
+
+  } catch (error) {
+    console.log(error.message);
+  }
+
+});
+
+
+// export const updatepost = async (req, res, next) => {
+//   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+//     return res.status(400).json({ message : "You are not allowed to update this post"})
+//   }
+//   try {
+//     const updatedPost = await Post.findByIdAndUpdate(
+//       req.params.postId,
+//       {
+//         $set: {
+//           title: req.body.title,
+//           content: req.body.content,
+//           category: req.body.category,
+//           image: req.body.image,
+//         },
+//       },
+//       { new: true }
+//     );
+//     res.status(200).json(updatedPost);
+//   } catch (error) {
+//     console.log(error);
+    
+//   }
+// };
+
+// export const updatePost = asyncHandler(async (req, res, next) => {
+//   try {
+//     const { postId, userId } = req.params;
+
+//     // Check if postId and userId are valid ObjectIds
+//     if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(400).json({ message : "Invalid post or user ID"})
+     
+//     }
+
+//     // Check if user is an admin or the owner of the post
+//     if (!req.user.isAdmin && req.user.id !== userId) {
+//       return res.status(400).json({ message : "You are not allowed to update this post"})
+//     }
+
+//     // Update post with provided data
+//     const updatedPost = await Post.findByIdAndUpdate(
+//       postId,
+//       {
+//         $set: {
+//           title: req.body.title,
+//           content: req.body.content,
+//           category: req.body.category,
+//           image: req.body.image,
+//         },
+//       },
+//       { new: true }
+//     );
+
+//     if (!updatedPost) {
+//       return res.status(400).json({ message : "Post not found"})
+//     }
+//     res.status(200).json(updatedPost);
+
+//   } catch (error) {
+//     console.log(error.message);
+   
+//   }
+// });
 
 
