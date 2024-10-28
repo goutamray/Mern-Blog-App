@@ -6,6 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 import createToast from "../utilis/toastify";
 import { signOutSuccess } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { HiAnnotation } from "react-icons/hi";
 
 const DashSidebar = () => {
   const location = useLocation();
@@ -67,6 +68,21 @@ const DashSidebar = () => {
                     </Link>
                     ) 
                   }
+                
+                {
+                    currentUser.isAdmin && (
+                      <Link to='/dashboard?tab=comments'>
+                        <Sidebar.Item
+                          active={tab === 'comments'}
+                          icon={HiAnnotation}
+                          as='div'
+                        >
+                          Comments
+                        </Sidebar.Item>
+                    </Link>
+                    ) 
+                  }
+
                   {
                     currentUser.isAdmin && (
                       <Link to='/dashboard?tab=users'>
@@ -80,6 +96,7 @@ const DashSidebar = () => {
                     </Link>
                     ) 
                   }
+           
                
                   <Sidebar.Item
                       icon={HiArrowSmRight}
