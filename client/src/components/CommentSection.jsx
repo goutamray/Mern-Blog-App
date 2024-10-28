@@ -1,7 +1,7 @@
 import { Alert, Button, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
 
 
@@ -11,8 +11,7 @@ const CommentSection = ({ postId }) => {
   const [commentError, setCommentError] = useState(null);
   const [comments, setComments] = useState([]);
 
- console.log(comments);
- 
+  const navigate = useNavigate(); 
 
   // handle Submit comment 
    const handleSubmit = async (e) => {
@@ -50,7 +49,6 @@ const CommentSection = ({ postId }) => {
    useEffect(() => {
        const getComments = async () => {
           const res = await fetch(`/api/comment/getPostComments/${postId}`);
-           
           const data = await res.json();
           if (res.ok) {
             setComments(data);
@@ -58,6 +56,39 @@ const CommentSection = ({ postId }) => {
        }
        getComments();
    }, [postId])
+
+
+   // handle like 
+   const handleLike = async(commentId)=> {
+      try {
+        if (!currentUser) {
+          navigate("/sign-in");
+          return;
+        }
+
+        const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+          method : "PATCH",
+        })
+
+        if (res.ok) {
+           const data = await res.json();
+           setComments(
+            comments.map((comment) =>
+              comment._id === commentId
+                ? {
+                    ...comment,
+                    likes: data.likes,
+                    numberOfLikes: data.likes.length,
+                  }
+                : comment
+            )
+          )
+        }
+      } catch (error) {
+        console.log(error.message);
+        
+      }
+   }
 
 
   return (
@@ -114,13 +145,13 @@ const CommentSection = ({ postId }) => {
           <div className="flex items-center my-5 gap-2 text-md ">
             <h2> Comments </h2>
             <div className="border border-gray-400 px-2 py-1 rounded-sm">
-              <p> {comments.length} </p>
+              <p> {comments?.length} </p>
             </div>
           </div>
 
          {
            comments?.map((item, index) => {
-            return <Comment key={index} item={item}/>
+            return <Comment key={index} item={item} onLike={handleLike}/>
            })
          }
           </>

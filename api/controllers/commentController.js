@@ -53,3 +53,38 @@ export const getPostComments = asyncHandler(async(req, res) => {
     console.log(error.message);
   }
 })
+
+
+/**
+ * @DESC UPDATE COMMENT 
+ * @METHOD PATCH 
+ * @ROUTE /api/comment/likeComment/:commentId 
+ * @ACCESS PUBLIC 
+ * 
+ */
+export const likeComment = asyncHandler(async(req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId );
+
+    if (!comment) {
+      return res.status(400).json({ message : "Comments Not Found"});
+    }
+
+    const userIndex = comment.likes.indexOf(req.user.id);
+
+    if (userIndex === -1) {
+      comment.numberOfLikes += 1; 
+      comment.likes.push(req.user.id);
+    }else{
+      comment.numberOfLikes -= 1; 
+      comment.likes.splice( userIndex, 1);
+    }
+
+    await comment.save(); 
+
+    return res.status(200).json(comment);
+
+  } catch (error) {
+    console.log(error.message);
+  }
+})
