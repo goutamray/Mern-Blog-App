@@ -90,6 +90,15 @@ const CommentSection = ({ postId }) => {
       }
    }
 
+   // handle edit 
+   const handleEdit = async(comment, editedContent) => {
+    setComments(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
+   }
+
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3 ">
@@ -151,7 +160,7 @@ const CommentSection = ({ postId }) => {
 
          {
            comments?.map((item, index) => {
-            return <Comment key={index} item={item} onLike={handleLike}/>
+            return <Comment key={index} item={item} onLike={handleLike} onEdit={handleEdit}/>
            })
          }
           </>
