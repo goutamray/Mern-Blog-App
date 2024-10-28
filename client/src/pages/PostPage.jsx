@@ -10,10 +10,9 @@ const PostPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
-
-  console.log(post);
   
   
+  // get single 
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -41,6 +40,8 @@ const PostPage = () => {
     fetchPost();
   }, [postSlug]); 
 
+
+  // loading 
   if(loading) return <div className="flex justify-center items-center min-h-screen"> 
     <Spinner size="xl"/>
   </div>
