@@ -166,3 +166,25 @@ export const signOutUser = asyncHandler(async(req, res) => {
    }
 }); 
 
+
+/**
+ * @DESC GET SINGLE USER 
+ * @METHOD get
+ * @ROUTE /api/user/:userId
+ * @ACCESS PUBLIC 
+ * 
+ */
+export const getUser = asyncHandler(async(req, res) => {
+   try {
+     const user = await User.findById(req.params.userId);
+
+     if (!user) {
+      return res.status(400).json({ message : "User Not Found"}); 
+     }
+     const {password, ...rest } = user._doc;
+     res.status(200).json(rest)
+   } catch (error) {
+     console.log(error.message);
+   }
+}); 
+
