@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.js";
 import authRouter from "./routes/auth.js";
 import postRouter from "./routes/post.js";
+import commentRouter from "./routes/comment.js";
 
 // env config
 dotenv.config();
@@ -33,6 +34,7 @@ app.use(cors({
 app.use("/api/user", userRouter); 
 app.use("/api/auth", authRouter); 
 app.use("/api/post", postRouter); 
+app.use("/api/comment", commentRouter); 
 
 
 // error handler 

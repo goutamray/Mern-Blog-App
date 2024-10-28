@@ -91,7 +91,7 @@ const UpdatePost = ()=> {
   };
 
 
-  const handleSubmit = async (e) => {
+  const handledataSubmit = async (e) => {
     e.preventDefault();
   
     try {
@@ -122,7 +122,7 @@ const UpdatePost = ()=> {
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Update post</h1>
-      <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+      <form className='flex flex-col gap-4' onSubmit={handledataSubmit}>
         <div className='flex flex-col gap-4 sm:flex-row justify-between'>
           <TextInput
             type='text'
