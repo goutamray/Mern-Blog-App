@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import createToast from "../utilis/toastify";
 import OAuth from "../components/OAuth";
+import Logo from "../components/Logo";
 
 
 const SignUp = () => {
@@ -53,8 +54,7 @@ const SignUp = () => {
            {/* left part */}
            <div className="flex-1">
             <Link to="/" className="text-sm sm:text-2xl font-bold dark:text-white  ">
-                 <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md text-white mr-1"> Goutam </span>
-                <span> Blog </span>
+               <Logo />
              </Link>
              <p className="text-sm mt-5">  This is a demo project. You can sign up with your email and password
              or with Google. </p>

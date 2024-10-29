@@ -112,10 +112,11 @@ const CreatePost = () => {
                    setFormData({ ...formData, category: e.target.value })
                 }
               >
-                  <option value="uncategorized"> Select a Category </option>
-                  <option value="javascript"> JavaScript </option>
-                  <option value="react"> React Js </option>
-                  <option value="next"> Next Js </option>
+                  <option value='uncategorized'>Uncategorized</option>
+                  <option value='reactjs'>React.js</option>
+                  <option value='nextjs'>Next.js</option>
+                  <option value='javascript'>JavaScript</option>
+                  <option value='seo'>Seo</option>
               </Select>
           </div>
           <div className="flex gap-4 items-center justify-between border-4 border-teal-500 p-3 border-dotted ">

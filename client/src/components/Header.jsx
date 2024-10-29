@@ -1,7 +1,9 @@
 import { Avatar, Button, Dropdown, DropdownDivider, Navbar, TextInput } from "flowbite-react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleTheme } from "../redux/theme/themeSlice";
+
+
 
 // react icons 
 import { AiOutlineSearch  } from "react-icons/ai"
@@ -9,15 +11,20 @@ import { FaMoon } from "react-icons/fa6";
 import { FaSun } from 'react-icons/fa';
 import createToast from "../utilis/toastify";
 import { signOutSuccess } from "../redux/user/userSlice";
+import { useEffect, useState } from "react";
+import Logo from "./Logo";
 
 
 const Header = () => {
   const path = useLocation().pathname;
   const dispatch = useDispatch(); 
+  const location  = useLocation(); 
+  const navigate = useNavigate(); 
 
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
 
+  const [searchTerm, setSearchTerm ] = useState('');
 
     // user sign out 
     const handleUserSignout = async() => {
@@ -39,25 +46,47 @@ const Header = () => {
       }
     }
 
+    // search 
+    useEffect(() => {
+      const urlParams = new URLSearchParams(location.search);
+      const searchTermFromUrl = urlParams.get('searchTerm');
+      if (searchTermFromUrl) {
+        setSearchTerm(searchTermFromUrl);
+      }
+    }, [location.search]);
+
+
+    // handleSubmit
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('searchTerm', searchTerm);
+      const searchQuery = urlParams.toString();
+      navigate(`/search?${searchQuery}`);
+    }
+
   return (
     <>
-      <Navbar className="border-b-2"> 
+      <Navbar className="border-b-2 sticky top-0 left-0 w-full z-50 bg-white"> 
         <Link to="/" className=" text-sm sm:text-xl font-semibold dark:text-white  ">
-           <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md text-white mr-1"> Goutam </span>
-           <span> Blog </span>
+          <Logo />
         </Link>
-        <form >
-          <TextInput 
-            type="text"
-            placeholder="Search..."
-            rightIcon={ AiOutlineSearch }
-            className="hidden lg:inline "
-          />
+
+        <form onSubmit={handleSubmit}>
+            <TextInput
+              type='text'
+              placeholder='Search...'
+              rightIcon={AiOutlineSearch}
+              className='hidden lg:inline'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
         </form>
         <Button 
+           type="submit"
            className="w-12 h-10 lg:hidden pill flex items-center justify-center" 
            color="gray"
-         >
+          >
            <AiOutlineSearch className="text-xl"/>
         </Button>
 
