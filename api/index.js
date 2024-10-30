@@ -11,6 +11,8 @@ import authRouter from "./routes/auth.js";
 import postRouter from "./routes/post.js";
 import commentRouter from "./routes/comment.js";
 
+import path from "path"
+
 // env config
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.use(cors({
   credentials : true,
 }));
 
+const __dirname = path.resolve();
 
 // routes 
 app.use("/api/user", userRouter); 
@@ -36,6 +39,12 @@ app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter); 
 app.use("/api/comment", commentRouter); 
 
+
+app.use(express.static(path.join(__dirname, '/client/dist'))); 
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'))
+}); 
 
 // error handler 
 app.use(errorHandler); 
