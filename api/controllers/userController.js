@@ -69,7 +69,7 @@ export const getAllUsers = asyncHandler(async(req, res) => {
  */
 export const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
+  const { name, email, photo } = req.body;
 
   try {
     const existingUser = await User.findById(id);
@@ -78,22 +78,13 @@ export const updateUser = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Handle photo upload if a new file is provided
-    let filedata = existingUser.photo;
-    if (req.file) {
-      console.log("File received for upload:", req.file); // Debug log
-      const data = await fileUploadToCloud(req.file.path);
-      filedata = data.secure_url;
-      console.log("Uploaded photo URL:", filedata); // Debug log
-    }
-
     // Update user data
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
         name: name || existingUser.name,
         email: email || existingUser.email,
-        photo: filedata,
+        photo: photo || existingUser.photo, 
       },
       { new: true }
     );
